@@ -56,7 +56,25 @@ type error interface{
 
 
 
+### type Reader
 
+```go
+type Reader interface {
+    Read(p []byte) (n int, err error)
+}
+```
+
+Reader 接口包装了基本的 Read 方法。
+
+Read 将 len(p) 个字节读取到 p 中。它返回读取的字节数 n（0 <= n <= len(p)） 以及任何遇到的错误。即使 Read 返回的 n < len(p)，它也会在调用过程中使用 p 的全部作为暂存空间。若一些数据可用但不到 len(p) 个字节，Read 会照例返回可用的东西， 而不是等待更多。
+
+当 Read 在成功读取 n > 0 个字节后遇到一个错误或 EOF 情况，它就会返回读取的字节数。 它会从相同的调用中返回（非nil的）错误或从随后的调用中返回错误（和 n == 0）。 这种一般情况的一个例子就是 Reader 在输入流结束时会返回一个非零的字节数， 可能的返回不是 err == EOF 就是 err == nil。无论如何，下一个 Read 都应当返回 0, EOF。
+
+调用者应当总在考虑到错误 err 前处理 n > 0 的字节。这样做可以在读取一些字节， 以及允许的 EOF 行为后正确地处理I/O错误。
+
+Read 的实现在 len(p) == 0 以外的情况下会阻止返回零字节的计数和 nil 错误， 调用者应将返回 0 和 nil 视作什么也没有发生；特别是它并不表示 EOF。
+
+实现必须不保留 p。
 
 ### Reader
 
@@ -67,6 +85,8 @@ func (T) Read(b []byte) (n int, err error)
 ```
 
 `Read` 用数据填充给定的字节切片并返回填充的字节数和错误值。在遇到数据流的结尾时，它会返回一个 `io.EOF` 错误。
+
+
 
 ```Go
 package main
@@ -81,7 +101,7 @@ func main() {
 	r := strings.NewReader("Hello, Reader!")
 	b := make([]byte, 8)
 	for {
-		n, err := r.Read(b)
+		n, err := r.Read(b) //一次读取把buffer 装满
 		fmt.Printf("n = %v err = %v b = %v\n", n, err, b)
 		fmt.Printf("b[:n] = %q\n", b[:n])
 		if err == io.EOF {
