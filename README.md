@@ -44,6 +44,20 @@ func (v *Vertex) Abs() float64 {
 
 ```
 
+### 错误
+
+`error`类型是一个内建接口
+
+```Go
+type error interface{
+    Error() string
+}
+```
+
+
+
+
+
 ### Reader
 
 `io.Reader` 接口有一个 `Read` 方法：
@@ -65,7 +79,6 @@ import (
 
 func main() {
 	r := strings.NewReader("Hello, Reader!")
-
 	b := make([]byte, 8)
 	for {
 		n, err := r.Read(b)
@@ -77,6 +90,20 @@ func main() {
 	}
 }
 
+```
+
+
+
+### 产生一个ascii字符A的无限流
+
+```Go
+func (mr MyReader) Read(b []byte) (int, error) {
+
+	b[0]='A'
+
+	return 1,nil
+
+}
 ```
 
 
