@@ -44,6 +44,45 @@ func (v *Vertex) Abs() float64 {
 
 ```
 
+### Reader
+
+`io.Reader` 接口有一个 `Read` 方法：
+
+```
+func (T) Read(b []byte) (n int, err error)
+```
+
+`Read` 用数据填充给定的字节切片并返回填充的字节数和错误值。在遇到数据流的结尾时，它会返回一个 `io.EOF` 错误。
+
+```Go
+package main
+
+import (
+	"fmt"
+	"io"
+	"strings"
+)
+
+func main() {
+	r := strings.NewReader("Hello, Reader!")
+
+	b := make([]byte, 8)
+	for {
+		n, err := r.Read(b)
+		fmt.Printf("n = %v err = %v b = %v\n", n, err, b)
+		fmt.Printf("b[:n] = %q\n", b[:n])
+		if err == io.EOF {
+			break
+		}
+	}
+}
+
+```
+
+
+
+
+
 ### rot13Reader
 
 有种常见的模式是一个 [`io.Reader`](https://go-zh.org/pkg/io/#Reader) 包装另一个 `io.Reader`，然后通过某种方式修改其数据流。
@@ -53,3 +92,16 @@ func (v *Vertex) Abs() float64 {
 编写一个实现了 `io.Reader` 并从另一个 `io.Reader` 中读取数据的 `rot13Reader`，通过应用 [rot13](http://en.wikipedia.org/wiki/ROT13) 代换密码对数据流进行修改。
 
 `rot13Reader` 类型已经提供。实现 `Read` 方法以满足 `io.Reader`。
+
+
+
+
+
+
+
+
+
+
+
+
+
